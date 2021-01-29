@@ -1,0 +1,93 @@
+version: "3.6"
+
+volumes:
+  nextcloud:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /etc/docker/nextcloud-data
+  postgres:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /etc/docker/nextcloud-postgres
+
+networks:
+  nextcloud-network:
+    name: nextcloud-network
+
+# Reusable shared config
+x-nc-shared: &nc-shared
+  networks:
+    - nextcloud-network
+  # After 10 restarts don't try it again, otherwise it could affect other services on the host machine by restarting infinitely
+  restart: on-failure:10
+  # Limit the logging files to 10 with 100mb each, otherwise there is no limit until the disk is full
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "100mb"
+      max-file: "10"
+
+services:
+  # Database used for OnlyOffice Document Server and Nextcloud itself
+  postgres:
+    build:
+      context: ./postgres
+    container_name: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - ./env_files/postgres.env
+    # Don't make it reachable outside of docker for security reasons
+    labels:
+      - traefik.enable=false
+    <<: *nc-shared
+
+  # Redis for caching with Nextcloud (This is optional)
+  nc-redis:
+    image: redis:6.0.10-alpine
+    container_name: nc-redis
+    # Don't make it reachable outside of docker for security reasons
+    labels:
+      - traefik.enable=false
+    <<: *nc-shared
+
+  nextcloud-app:
+    build:
+      context: ./nextcloud
+    # image: nextcloud:20.0.6-apache
+    container_name: nextcloud-app
+    depends_on:
+      - postgres
+      - nc-redis
+    volumes:
+      - nextcloud:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - ./env_files/postgres.env
+      - ./env_files/nextcloud.env
+    labels:
+      - traefik.docker.network=nextcloud-network
+      - traefik.frontend.rule=Host:${NEXTCLOUD_DOMAIN}
+      - traefik.port=80
+    <<: *nc-shared
+
+  # Traefik for routing
+  router:
+    image: traefik:1.7.26-alpine
+    container_name: router
+    command: --api --docker
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/traefik.toml
+      - ./traefik/acme.json:/acme.json
+    labels:
+      - traefik.enable=false
+    <<: *nc-shared
