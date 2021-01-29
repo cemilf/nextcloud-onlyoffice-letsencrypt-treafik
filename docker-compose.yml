@@ -57,9 +57,10 @@ services:
     <<: *nc-shared
 
   nextcloud-app:
-    build:
-      context: ./nextcloud
+    #build:
+    #  context: ./nextcloud
     # image: nextcloud:20.0.6-apache
+    image: nextcloud:21-beta
     container_name: nextcloud-app
     depends_on:
       - postgres
