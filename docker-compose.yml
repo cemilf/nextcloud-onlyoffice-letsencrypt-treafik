@@ -6,13 +6,13 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /var/docker/nextcloud-data:Z
+      device: /var/docker/nextcloud/data
   postgres:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /var/docker/nextcloud-postgres:Z
+      device: /var/docker/nextcloud/db
 
 networks:
   nextcloud-network:
