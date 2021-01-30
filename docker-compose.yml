@@ -13,7 +13,6 @@ volumes:
       o: bind
       type: none
       device: /var/docker/nextcloud/db
-
 networks:
   nextcloud-network:
     name: nextcloud-network
@@ -59,8 +58,8 @@ services:
   nextcloud-app:
     #build:
     #  context: ./nextcloud
-    # image: nextcloud:20.0.6-apache
-    image: nextcloud:21-beta
+    image: nextcloud:20.0.6-apache
+    #image: nextcloud:21-beta
     container_name: nextcloud-app
     depends_on:
       - postgres
