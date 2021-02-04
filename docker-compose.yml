@@ -39,6 +39,7 @@ x-nc-shared: &nc-shared
 
 services:
   clamavd:
+    image: dinkel/clamavd
     container_name: clamavd
     labels:
       - traefik.enable=false
