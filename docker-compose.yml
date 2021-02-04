@@ -100,14 +100,21 @@ services:
       - traefik.frontend.rule=Host:${NEXTCLOUD_DOMAIN}
       - traefik.port=80
       - traefik.enable=true
+
+      # Set WebDav redirects
       - traefik.frontend.redirect.permanent='true'
       - traefik.frontend.redirect.regex=https://(.*)/.well-known/(card|cal)dav
       - traefik.frontend.redirect.replacement=https://$$1/remote.php/dav/
+
+      # Set "Strict-Transport-Security" HTTP header for enhanced security
+      - "traefik.http.middlewares.sts_headers.headers.stsSeconds=15552000"
+      - "traefik.http.middlewares.sts_headers.headers.stsIncludeSubdomains=True"
+
       - "traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true"
       - "traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav"
       - "traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/"
       - "traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.nextcloud.middlewares=nextcloud-caldav@docker"
+      - "traefik.http.routers.nextcloud.middlewares=nextcloud-caldav,sts_headers"
       - "traefik.http.routers.nextcloud.tls=true"
       - "traefik.http.routers.nextcloud.tls.certresolver=default"
     <<: *nc-shared
