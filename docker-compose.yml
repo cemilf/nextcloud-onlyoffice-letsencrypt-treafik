@@ -87,15 +87,16 @@ services:
     <<: *nc-shared
 
   nextcloud-app:
-    #build:
-    #  context: ./nextcloud
+    build:
+      context: ./nextcloud
     #image: nextcloud:20.0.6-apache
-    image: nextcloud:21-beta
+    #image: nextcloud:21-beta
     container_name: nextcloud-app
     depends_on:
       - postgres
       - nc-redis
       - nc-elasticsearch
+      - clamavd
     volumes:
       - nextcloud:/var/www/html
       - /etc/localtime:/etc/localtime:ro
@@ -114,6 +115,10 @@ services:
       - traefik.frontend.redirect.replacement=https://$$1/remote.php/dav/
 
       # Set "Strict-Transport-Security" HTTP header for enhanced security
+      - traefik.frontend.headers.stsSeconds=15552000
+      - traefik.frontend.headers.stsIncludeSubdomains='true'
+
+
       - "traefik.http.middlewares.sts_headers.headers.stsSeconds=15552000"
       - "traefik.http.middlewares.sts_headers.headers.stsIncludeSubdomains=True"
 

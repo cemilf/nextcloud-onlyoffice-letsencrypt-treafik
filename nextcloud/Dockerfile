@@ -1,14 +1,13 @@
-FROM nextcloud:20.0.6-apache
+FROM nextcloud:21.0-beta
 
 RUN set -ex; \
     \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-        dnsutils \
+        curl \
         ffmpeg \
         libmagickcore-6.q16-6-extra \
-        imagemagick \
-        php-imagick \
+        dnsutils \
         procps \
         smbclient \
         supervisor \
