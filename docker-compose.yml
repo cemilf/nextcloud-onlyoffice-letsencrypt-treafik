@@ -38,6 +38,12 @@ x-nc-shared: &nc-shared
       max-file: "10"
 
 services:
+  clamavd:
+    container_name: clamavd
+    labels:
+      - traefik.enable=false
+    <<: *nc-shared
+
   # Database used for OnlyOffice Document Server and Nextcloud itself
   postgres:
     build:
@@ -82,8 +88,8 @@ services:
   nextcloud-app:
     #build:
     #  context: ./nextcloud
-    image: nextcloud:20.0.6-apache
-    #image: nextcloud:21-beta
+    #image: nextcloud:20.0.6-apache
+    image: nextcloud:21-beta
     container_name: nextcloud-app
     depends_on:
       - postgres

@@ -4,6 +4,7 @@ RUN set -ex; \
     \
     apt-get update; \
     apt-get install -y --no-install-recommends \
+        dnsutils \
         ffmpeg \
         libmagickcore-6.q16-6-extra \
         imagemagick \
