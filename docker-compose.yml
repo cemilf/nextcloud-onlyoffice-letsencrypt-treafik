@@ -19,7 +19,7 @@ volumes:
       o: bind
       type: none
       device: /var/docker/nextcloud/es
-      
+
 networks:
   nextcloud-network:
     name: nextcloud-network
@@ -100,6 +100,9 @@ services:
       - traefik.frontend.rule=Host:${NEXTCLOUD_DOMAIN}
       - traefik.port=80
       - traefik.enable=true
+      - traefik.frontend.redirect.permanent='true'
+      - traefik.frontend.redirect.regex=https://(.*)/.well-known/(card|cal)dav
+      - traefik.frontend.redirect.replacement=https://$$1/remote.php/dav/
       - "traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true"
       - "traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav"
       - "traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/"
