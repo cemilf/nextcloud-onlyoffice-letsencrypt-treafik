@@ -10,6 +10,9 @@ RUN set -ex; \
         dnsutils \
         procps \
         smbclient \
+        unrar \
+        p7zip \
+        p7zip-full \
         supervisor \
 #       libreoffice \
     ; \
@@ -33,6 +36,7 @@ RUN set -ex; \
         imap \
     ; \
     pecl install smbclient; \
+    pecl -v install rar; \
     docker-php-ext-enable smbclient; \
     \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
@@ -49,6 +53,7 @@ RUN set -ex; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*
 
+
 RUN mkdir -p \
     /var/log/supervisord \
     /var/run/supervisord \
@@ -57,5 +62,8 @@ RUN mkdir -p \
 COPY supervisord.conf /
 
 ENV NEXTCLOUD_UPDATE=1
+
+COPY ./entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
