@@ -10,7 +10,6 @@ RUN set -ex; \
         dnsutils \
         procps \
         smbclient \
-        unrar \
         p7zip \
         p7zip-full \
         supervisor \
