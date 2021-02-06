@@ -9,6 +9,16 @@ RUN set -ex; \
         rsync \
         bzip2 \
         busybox-static \
+        curl \
+        dnsutils \
+        ffmpeg \
+        libmagickcore-6.q16-6-extra \
+        procps \
+        smbclient \
+        p7zip \
+        p7zip-full \
+        supervisor \
+#       libreoffice \
     ; \
     rm -rf /var/lib/apt/lists/*; \
     \
@@ -38,11 +48,16 @@ RUN set -ex; \
         libzip-dev \
         libwebp-dev \
         libgmp-dev \
+        libbz2-dev \
+        libc-client-dev \
+        libkrb5-dev \
+        libsmbclient-dev \
     ; \
     \
     debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
     docker-php-ext-configure ldap --with-libdir="lib/$debMultiarch"; \
+    docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
     docker-php-ext-install -j "$(nproc)" \
         bcmath \
         exif \
@@ -55,6 +70,8 @@ RUN set -ex; \
         pdo_pgsql \
         zip \
         gmp \
+        bz2 \
+        imap \
     ; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately
@@ -62,12 +79,15 @@ RUN set -ex; \
     pecl install memcached-3.1.5; \
     pecl install redis-5.3.3; \
     pecl install imagick-3.4.4; \
+    pecl install smbclient; \
+    pecl -v install rar; \
     \
     docker-php-ext-enable \
         apcu \
         memcached \
         redis \
         imagick \
+        smbclient \
     ; \
     \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
@@ -146,5 +166,17 @@ RUN set -ex; \
 COPY *.sh upgrade.exclude /
 COPY config/* /usr/src/nextcloud/config/
 
+RUN mkdir -p \
+    /var/log/supervisord \
+    /var/run/supervisord \
+;
+
+COPY supervisord.conf /
+
+RUN chmod +x /*.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2-foreground"]
+
+#CMD ["apache2-foreground"]
+
+CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
