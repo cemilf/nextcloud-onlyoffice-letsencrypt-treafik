@@ -63,6 +63,7 @@ COPY supervisord.conf /
 ENV NEXTCLOUD_UPDATE=1
 
 COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
