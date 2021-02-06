@@ -173,6 +173,8 @@ RUN mkdir -p \
 
 COPY supervisord.conf /
 
+RUN chmod +x /*.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 
 #CMD ["apache2-foreground"]
