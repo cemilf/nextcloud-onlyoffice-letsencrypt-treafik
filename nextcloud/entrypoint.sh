@@ -187,9 +187,7 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
 fi
 
 
-
-
-function install_custom_apps(){
+install_custom_apps(){
   # https://stackoverflow.com/a/39568613/6334421
   # https://docs.nextcloud.com/server/19/admin_manual/configuration_server/>
 
