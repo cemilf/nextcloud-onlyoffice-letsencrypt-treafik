@@ -186,22 +186,26 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
     fi
 fi
 
+file_env CUSTOM_APPS
+
+
 install_custom_apps(){
   # https://stackoverflow.com/a/39568613/6334421
   # https://docs.nextcloud.com/server/19/admin_manual/configuration_server/>
 
   set +u
   set -- $CUSTOM_APPS  # don't quote variable here
-  while [ -n "$1" ]; do
-    run_as echo "Trying to install $1"
-    run_as "php /var/www/html/occ app:install $1" || echo "<< WARNING - $1 NOT INSTALLED >>"
-    run_as "php /var/www/html/occ app:enable $1" || echo "<< WARNING - $1 NOT ENBLED >> "
-    shift
+
+  for APP in $CUSTOM_APPS ; do
+    run_as echo "Trying to install $APP"
+    run_as "php /var/www/html/occ app:install $APP" || echo "<< WARNING - $APP NOT INSTALLED >>"
+    run_as "php /var/www/html/occ app:enable $APP" || echo "<< WARNING - $APP NOT ENBLED >> "
   done
+
   set -u
 }
 
-#file_env CUSTOM_APPS
+
 install_custom_apps
 
 
